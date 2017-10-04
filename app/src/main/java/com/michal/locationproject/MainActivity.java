@@ -1,6 +1,10 @@
 package com.michal.locationproject;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -19,16 +23,46 @@ import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = "MainActivity";
+
     private EditText editText1, editText2, editText3;
     private TextView statusText;
     private Button sendJsonButtton;
     private boolean isConnected;
+
+    BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent == null) {
+                log("intent is null");
+                return;
+            }
+
+            if (intent.getExtras().isEmpty()) {
+                log("extras are empty");
+                return;
+            }
+
+            showToast("Response Code + " + intent.getExtras().getInt("POST_RESPONSE"));
+        }
+    };
+
+    void showToast(String message) {
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+    }
 
 
     @Override
     protected void onResume() {
         super.onResume();
         checkConnection();
+        this.registerReceiver(mBroadcastReceiver, new IntentFilter("POST_ACTION"));
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        this.unregisterReceiver(mBroadcastReceiver);
     }
 
     @Override
@@ -77,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
             //type url you want to post to
 //            new PostJSONAsyncTask(this)
 //                    .execute("https://requestb.in/11hw95m1", obtainData().toString());
-new PostJSONOkHttp(this).post("https://requestb.in/11hw95m1", obtainData().toString());
+new PostJSONOkHttp(this).post("https://requestb.in/1dhsheu1", obtainData().toString());
         } else {
             Toast.makeText(this, "empty values!", Toast.LENGTH_SHORT).show();
         }
@@ -101,5 +135,10 @@ new PostJSONOkHttp(this).post("https://requestb.in/11hw95m1", obtainData().toStr
     private boolean validateSource() {
         return !TextUtils.isEmpty(editText1.getText()) && !TextUtils.isEmpty(editText2.getText())
                 && !TextUtils.isEmpty(editText3.getText());
+    }
+
+
+    private void log(String message) {
+        Log.e(TAG, message);
     }
 }

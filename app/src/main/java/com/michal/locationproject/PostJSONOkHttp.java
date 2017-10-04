@@ -1,6 +1,7 @@
 package com.michal.locationproject;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -42,12 +43,15 @@ public class PostJSONOkHttp {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                Log.e("TAG", "bla");
-                if (response.isSuccessful()) {
-                    Log.e("TAG", "" +response);
+                Log.e("TAG", "bla" + response.code());
 
-                } else {
-                    Log.e("TAG", "fail");
+                try {
+
+                    Intent i = new Intent("POST_ACTION");
+                    i.putExtra("POST_RESPONSE", response.code());
+                    context.sendBroadcast(i);
+                } catch (Exception e) {
+                    Log.e("TAG", "EXCEPTION", e);
                 }
 
             }
