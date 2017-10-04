@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.michal.locationproject.MainActivity">
+
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:orientation="vertical"
+       android:gravity="center">
+
+       <TextView
+           android:id="@+id/status"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="status"/>
+
+
+       <EditText
+           android:id="@+id/jsonFirstParameter"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:hint="JSON first parameter"/>
+
+       <EditText
+           android:id="@+id/jsonSecondParameter"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:hint="JSON second parameter"/>
+       <EditText
+           android:id="@+id/jsonThirdParameter"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:hint="JSON third parameter"/>
+
+
+       <Button
+           android:id="@+id/sendJSONButton"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="send"/>
+
+
+   </LinearLayout>
+
+</RelativeLayout>
