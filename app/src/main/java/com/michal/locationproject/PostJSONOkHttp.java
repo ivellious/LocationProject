@@ -2,7 +2,6 @@ package com.michal.locationproject;
 
 import android.content.Context;
 import android.content.Intent;
-import android.widget.Toast;
 
 import java.io.IOException;
 
@@ -20,7 +19,6 @@ import okhttp3.Response;
 
 public class PostJSONOkHttp {
 
-    public static final String POST_ACTION = "POST_ACTION";
     public static final String POST_RESPONSE_EXTRA = "POST_RESPONSE";
     private static final String TAG = "PostJSONOkHttp";
 
@@ -43,17 +41,16 @@ public class PostJSONOkHttp {
 
             @Override
             public void onFailure(Call call, IOException e) {
-                Toast.makeText(context, "post failed to execute", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(context, "post failed to execute", Toast.LENGTH_SHORT).show();
+                context.sendBroadcast(new Intent(MainActivity.MAIN_ACTIVITY_RECEIVER));
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 logger.log("response code is " + response.code());
-                    Intent i = new Intent(POST_ACTION);
-                    i.putExtra(POST_RESPONSE_EXTRA, response.code());
-                    context.sendBroadcast(i);
-
-
+//                    Intent i = new Intent(POST_ACTION);
+//                    i.putExtra(POST_RESPONSE_EXTRA, response.code());
+                    context.sendBroadcast(new Intent(MainActivity.MAIN_ACTIVITY_RECEIVER).putExtra(POST_RESPONSE_EXTRA, response.code()));
             }
         });
 
