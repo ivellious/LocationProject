@@ -2,7 +2,6 @@ package com.michal.locationproject;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -21,14 +20,20 @@ import okhttp3.Response;
 
 public class PostJSONOkHttp {
 
+    public static final String POST_ACTION = "POST_ACTION";
+    public static final String POST_RESPONSE_EXTRA = "POST_RESPONSE";
+    private static final String TAG = "PostJSONOkHttp";
+
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
     private Context context;
     private OkHttpClient httpClient;
+    private SimpleLogger logger;
 
     public PostJSONOkHttp(Context context) {
         this.context = context;
         httpClient = new OkHttpClient();
+        logger = new SimpleLogger(TAG);
     }
 
     public void post(String url, String jsonData) {
@@ -38,21 +43,16 @@ public class PostJSONOkHttp {
 
             @Override
             public void onFailure(Call call, IOException e) {
-                Toast.makeText(context, "failiure", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "post failed to execute", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                Log.e("TAG", "bla" + response.code());
-
-                try {
-
-                    Intent i = new Intent("POST_ACTION");
-                    i.putExtra("POST_RESPONSE", response.code());
+                logger.log("response code is " + response.code());
+                    Intent i = new Intent(POST_ACTION);
+                    i.putExtra(POST_RESPONSE_EXTRA, response.code());
                     context.sendBroadcast(i);
-                } catch (Exception e) {
-                    Log.e("TAG", "EXCEPTION", e);
-                }
+
 
             }
         });

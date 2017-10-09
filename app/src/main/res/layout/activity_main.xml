@@ -44,6 +44,16 @@
            android:layout_height="wrap_content"
            android:text="send"/>
 
+       <TextView
+           android:id="@+id/currentLocationText"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="Here will be displayed current location if possible"
+           />
+
+
+
+
 
    </LinearLayout>
 
