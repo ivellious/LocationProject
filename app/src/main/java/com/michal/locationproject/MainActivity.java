@@ -24,8 +24,13 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -155,7 +160,19 @@ public class MainActivity extends AppCompatActivity {
                                             dataToSendJSONObject.accumulate(LAST_LOCATION_TIME
                                                     , obtainLastKnownLocationTime(location));
                                             if (isConnected) {
-                                                new PostJSONOkHttp(getApplicationContext())
+                                                new PostJSONOkHttp(getApplicationContext(), new Callback() {
+                                                    @Override
+                                                    public void onFailure(Call call, IOException e) {
+                                                        sendBroadcast(new Intent(MainActivity.MAIN_ACTIVITY_RECEIVER));
+                                                    }
+
+                                                    @Override
+                                                    public void onResponse(Call call, Response response) throws IOException {
+                                                        logger.log("response code is " + response.code());
+
+                                                        sendBroadcast(new Intent(MainActivity.MAIN_ACTIVITY_RECEIVER).putExtra(PostJSONOkHttp.POST_RESPONSE_EXTRA, response.code()));
+                                                    }
+                                                })
                                                         .post("https://requestb.in/19xdfcv1"
                                                                 , dataToSendJSONObject.toString());
 

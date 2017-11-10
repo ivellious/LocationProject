@@ -17,6 +17,13 @@
         <activity android:name=".MainActivity"
                   android:screenOrientation="portrait"
                   android:configChanges="orientation|screenSize">
+
+        </activity>
+
+        <activity android:name=".FirstLogInActivity"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
