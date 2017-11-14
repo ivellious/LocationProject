@@ -37,12 +37,12 @@ public class LocationAppSharedPreferences {
         getSharedPreferencesEditor().putString(USER_SURNAME_KEY, surname).commit();
     }
 
-    public void getNameFromSharedPreferences() {
-        getSharedPreferences().getString(USER_NAME_KEY, "");
+    public String getNameFromSharedPreferences() {
+        return getSharedPreferences().getString(USER_NAME_KEY, "");
     }
 
-    public void getSurnameFromSharedPreferences() {
-        getSharedPreferences().getString(USER_SURNAME_KEY, "");
+    public String getSurnameFromSharedPreferences() {
+        return getSharedPreferences().getString(USER_SURNAME_KEY, "");
     }
 
     //// TODO: 18.10.17 GET TOKEN FROM SERVER AND PUT IT AS SHARED PREFERENCE

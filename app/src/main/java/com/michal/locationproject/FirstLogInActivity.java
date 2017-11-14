@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -36,7 +35,7 @@ public class FirstLogInActivity extends AppCompatActivity {
         super.onResume();
         if (isUserEnrolled()) {
             Intent intent = new Intent(FirstLogInActivity.this, MainActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             this.startActivity(intent);
         }
     }
@@ -46,13 +45,6 @@ public class FirstLogInActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.log_in_activity);
         mLogger = new SimpleLogger(FirstLogInActivity.class.getSimpleName());
-
-        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-            @Override
-            public void uncaughtException(Thread paramThread, Throwable paramThrowable) {
-                Log.e("Location App"," Something went wrong", paramThrowable);
-            }
-        });
 
 
 
@@ -79,7 +71,8 @@ public class FirstLogInActivity extends AppCompatActivity {
     }
 
     public boolean isUserEnrolled() {
-        return false;
+
+        return !new LocationAppSharedPreferences(this).getNameFromSharedPreferences().equals("");
     }
 
 
@@ -101,11 +94,20 @@ public class FirstLogInActivity extends AppCompatActivity {
                     //// TODO: 10.11.17 add token from response to shared prefs
                     Toast.makeText(getApplicationContext(), "Registration Successful", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(FirstLogInActivity.this, MainActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
 
                 } else {
-                    showToast("elooo");
+                    //!!!!!!!!!!!!!!
+                    showToast("Response is not 200");
+                    LocationAppSharedPreferences sharedPreferences = new LocationAppSharedPreferences(getApplicationContext());
+                    sharedPreferences.saveNameToSharedPreferences(nameEdiText.getText().toString());
+                    sharedPreferences.saveSurnameToSharedPreferences(surnameEditText.getText().toString());
+                    //// TODO: 10.11.17 add token from response to shared prefs
+                   /// Toast.makeText(getApplicationContext(), "Registration Successful", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(FirstLogInActivity.this, MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
                 }
 
 
