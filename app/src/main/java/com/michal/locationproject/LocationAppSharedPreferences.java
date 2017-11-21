@@ -9,8 +9,9 @@ import android.content.SharedPreferences;
 
 public class LocationAppSharedPreferences {
 
-    public static final String USER_SURNAME_KEY = "USER_SURNAME";
-    public static final String USER_NAME_KEY = "USER_NAME";
+    public static final String USER_SURNAME_KEY = "surname";
+    public static final String USER_NAME_KEY = "name";
+    public static final String TOKEN = "id";
     private static final String LOCATION_PROJECT_SHARED_PREFERENCES_NAME = "com.michal.locationproject.SHARED_PREFERENCES_FILE";
 
     private Context context;
@@ -43,6 +44,14 @@ public class LocationAppSharedPreferences {
 
     public String getSurnameFromSharedPreferences() {
         return getSharedPreferences().getString(USER_SURNAME_KEY, "");
+    }
+
+    public void saveToken(int id) {
+        getSharedPreferencesEditor().putInt(TOKEN,id).commit();
+    }
+
+    public int getToken() {
+        return getSharedPreferences().getInt(TOKEN, -1);
     }
 
     //// TODO: 18.10.17 GET TOKEN FROM SERVER AND PUT IT AS SHARED PREFERENCE

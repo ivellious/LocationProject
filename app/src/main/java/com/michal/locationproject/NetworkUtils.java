@@ -11,6 +11,8 @@ import android.net.NetworkInfo;
 
 public class NetworkUtils {
 
+    public static final String URL = "http://35.159.16.182/";
+
     private Context context;
     public NetworkUtils(Context context) {
         this.context = context;

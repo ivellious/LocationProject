@@ -26,6 +26,8 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
+import static com.michal.locationproject.NetworkUtils.URL;
+
 /**
  * Created by michal on 14.11.17.
  */
@@ -37,7 +39,7 @@ public class LocationBroadcastReceiver extends BroadcastReceiver {
     private static final String SURNAME = "surname";
     private static final String LONGITUDE = "longitude";
     private static final String LATITUDE = "latitude";
-    private static final String LAST_LOCATION_TIME = "last_location_time";
+    private static final String LAST_LOCATION_TIME = "lastLocationTime";
 
     private FusedLocationProviderClient fusedLocationProviderClient;
     private SimpleLogger simpleLogger;
@@ -66,14 +68,16 @@ public class LocationBroadcastReceiver extends BroadcastReceiver {
     }
 
     private void getFineLocation(final Context context) {
+
+        final int id = new LocationAppSharedPreferences(context).getToken();
         final LocationRequest locationRequest = new LocationRequest();
-        locationRequest.setInterval(120000);
-        locationRequest.setFastestInterval(30000);
+        locationRequest.setInterval(30000);
+        locationRequest.setFastestInterval(15000);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
 
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
-
+        builder.addLocationRequest(locationRequest);
         SettingsClient client = LocationServices.getSettingsClient(context);
 
         Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
@@ -100,14 +104,16 @@ public class LocationBroadcastReceiver extends BroadcastReceiver {
                                         + simpleDateFormat.format(resultDate));
 
                                 try {
-                                    JSONObject dataToSendJSONObject = obtainData(context);
+                                    JSONObject dataToSendJSONObject = new JSONObject();
 
+                                    dataToSendJSONObject.accumulate(LAST_LOCATION_TIME
+                                            , location.getTime());
                                     dataToSendJSONObject.accumulate(LATITUDE
                                             , location.getLatitude());
                                     dataToSendJSONObject.accumulate(LONGITUDE
                                             , location.getLongitude());
-                                    dataToSendJSONObject.accumulate(LAST_LOCATION_TIME
-                                            , location.getTime());
+
+                                    simpleLogger.log(dataToSendJSONObject.toString());
                                     new PostJSONOkHttp(context, new Callback() {
                                         @Override
                                         public void onFailure(Call call, IOException e) {
@@ -119,7 +125,7 @@ public class LocationBroadcastReceiver extends BroadcastReceiver {
                                             simpleLogger.log("response code is " + response.code());
                                         }
                                     })
-                                            .post("https://requestb.in/ttzqj9tu"
+                                            .post(URL+"location/personId="+id
                                                     , dataToSendJSONObject.toString());
                                 } catch (JSONException e) {
                                     simpleLogger.log("Failed to obtain data", e);

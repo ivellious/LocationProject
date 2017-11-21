@@ -47,9 +47,7 @@ public class FirstLogInActivity extends AppCompatActivity {
         mLogger = new SimpleLogger(FirstLogInActivity.class.getSimpleName());
 
 
-
-
-        nameEdiText =(EditText) findViewById(R.id.insertNameEditText);
+        nameEdiText = (EditText) findViewById(R.id.insertNameEditText);
         surnameEditText = (EditText) findViewById(R.id.insertSurnameEditText);
         submitButton = (Button) findViewById(R.id.submitButton);
 
@@ -81,7 +79,7 @@ public class FirstLogInActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call call, IOException e) {
-              //  Toast.makeText(getApplicationContext(), "Registration Failure", Toast.LENGTH_SHORT).show();
+                showToast("Failure");
             }
 
             @Override
@@ -89,39 +87,44 @@ public class FirstLogInActivity extends AppCompatActivity {
 
                 if (response.code() == 200) {
                     LocationAppSharedPreferences sharedPreferences = new LocationAppSharedPreferences(getApplicationContext());
+                    String responseString = "";
+                    if (response.body() != null) {
+                        responseString = response.body().string();
+                    }
+                    mLogger.log("response string : " + responseString);
+                    JSONObject responseJson;
+                    if (TextUtils.isEmpty(responseString)) {
+                        showToast("response string is null");
+                        return;
+                    }
+                    try {
+                        responseJson = new JSONObject(responseString);
+                        sharedPreferences.saveToken(Integer.valueOf(responseJson.get("id").toString()));
+
+                    } catch (JSONException e) {
+                        mLogger.log("converting response", e);
+                    }
+                    mLogger.log("id: " + sharedPreferences.getToken());
                     sharedPreferences.saveNameToSharedPreferences(nameEdiText.getText().toString());
                     sharedPreferences.saveSurnameToSharedPreferences(surnameEditText.getText().toString());
-                    //// TODO: 10.11.17 add token from response to shared prefs
-                    Toast.makeText(getApplicationContext(), "Registration Successful", Toast.LENGTH_SHORT).show();
+                    showToast("Registration successful");
                     Intent intent = new Intent(FirstLogInActivity.this, MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
 
                 } else {
-                    //!!!!!!!!!!!!!!
                     showToast("Response is not 200");
-                    LocationAppSharedPreferences sharedPreferences = new LocationAppSharedPreferences(getApplicationContext());
-                    sharedPreferences.saveNameToSharedPreferences(nameEdiText.getText().toString());
-                    sharedPreferences.saveSurnameToSharedPreferences(surnameEditText.getText().toString());
-                    //// TODO: 10.11.17 add token from response to shared prefs
-                   /// Toast.makeText(getApplicationContext(), "Registration Successful", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(FirstLogInActivity.this, MainActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
                 }
 
 
-
             }
-        }).post("https://requestb.in/19xdfcv1", getRegistrationData());
+        }).post(NetworkUtils.URL + "/person", getRegistrationData());
     }
 
 
-    public void showToast(final String toast)
-    {
+    public void showToast(final String toast) {
         runOnUiThread(new Runnable() {
-            public void run()
-            {
+            public void run() {
                 Toast.makeText(FirstLogInActivity.this, toast, Toast.LENGTH_SHORT).show();
             }
         });
@@ -130,7 +133,6 @@ public class FirstLogInActivity extends AppCompatActivity {
 
     private String getRegistrationData() throws JSONException {
         JSONObject postData = new JSONObject();
-
         postData.accumulate(LocationAppSharedPreferences.USER_NAME_KEY, nameEdiText.getText());
         postData.accumulate(LocationAppSharedPreferences.USER_SURNAME_KEY, surnameEditText.getText());
         return postData.toString();
