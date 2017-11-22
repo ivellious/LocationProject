@@ -28,16 +28,11 @@ import com.google.android.gms.tasks.Task;
 public class MainActivity extends AppCompatActivity {
 
     private static final int LOCATION_PERMISSION = 1;
-    private static final String TAG = "MainActivity";
-    private static final String NAME = "name";
-    private static final String SURNAME = "surname";
-    private static final String LONGITUDE = "longitude";
-    private static final String LATITUDE = "latitude";
-    private static final String LAST_LOCATION_TIME = "last_location_time";
+    private static final int PENDING_INTENT_LOCATION_CODE = 1123;
+    private static final String TAG = MainActivity.class.getSimpleName();
     public static final String MAIN_ACTIVITY_RECEIVER = "MAIN_ACTIVITY_RECEIVER";
     PendingIntent locationPendingIntent;
 
-    private TextView locationTextView;
     private TextView statusText;
     private Button sendJSONButton;
     private boolean isConnected;
@@ -50,16 +45,12 @@ public class MainActivity extends AppCompatActivity {
 
             if (intent.getExtras().isEmpty()) {
                 logger.log("extras are empty");
-                showToast("Something went wrong while sending data");
                 return;
             }
 
             if (intent.getExtras().getBoolean(ConnectivityChangeBroadcastReceiver.INTERNET_CONNECTION, false)) {
                 updateConnectionStatus();
-                return;
             }
-
-            showToast("Response Code + " + intent.getExtras().getInt(PostJSONOkHttp.POST_RESPONSE_EXTRA));
         }
     };
 
@@ -116,7 +107,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void initViews() {
         statusText = (TextView) this.findViewById(R.id.status);
-        locationTextView = (TextView) this.findViewById(R.id.currentLocationText);
         sendJSONButton = (Button) this.findViewById(R.id.sendJSONButton);
         sendJSONButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -132,8 +122,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void checkLocationSettings() {
         final LocationRequest locationRequest = new LocationRequest();
-        locationRequest.setInterval(java.util.concurrent.TimeUnit.SECONDS.toMillis(10));
-        locationRequest.setFastestInterval(java.util.concurrent.TimeUnit.SECONDS.toMillis(5));
+        locationRequest.setInterval(java.util.concurrent.TimeUnit.SECONDS.toMillis(20));
+        locationRequest.setFastestInterval(java.util.concurrent.TimeUnit.SECONDS.toMillis(10));
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
         SettingsClient client = LocationServices.getSettingsClient(this);
@@ -142,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
                 Intent locationIntent = new Intent(getApplicationContext(), LocationBroadcastReceiver.class);
-                locationPendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 132, locationIntent, 0);
+                locationPendingIntent = PendingIntent.getBroadcast(getApplicationContext(), PENDING_INTENT_LOCATION_CODE, locationIntent, 0);
 
                 try {
                     fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationPendingIntent);

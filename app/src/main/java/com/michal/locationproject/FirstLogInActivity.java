@@ -19,6 +19,10 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
+import static com.michal.locationproject.LocationAppSharedPreferences.TOKEN;
+import static com.michal.locationproject.LocationAppSharedPreferences.USER_NAME_KEY;
+import static com.michal.locationproject.LocationAppSharedPreferences.USER_SURNAME_KEY;
+
 /**
  * Created by michal on 18.10.17.
  */
@@ -34,9 +38,7 @@ public class FirstLogInActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (isUserEnrolled()) {
-            Intent intent = new Intent(FirstLogInActivity.this, MainActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-            this.startActivity(intent);
+            goToMain();
         }
     }
 
@@ -56,12 +58,13 @@ public class FirstLogInActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (TextUtils.isEmpty(nameEdiText.getText()) || TextUtils.isEmpty(surnameEditText.getText())) {
-                    Toast.makeText(getApplicationContext(), "Fill name an surname", Toast.LENGTH_SHORT).show();
+                    showToast("Fill in empty fields.");
                     return;
                 }
                 try {
                     registerUser();
                 } catch (JSONException e) {
+                    showToast("Something went wrong.");
                     mLogger.log("JSON FAIL", e);
                 }
             }
@@ -69,7 +72,6 @@ public class FirstLogInActivity extends AppCompatActivity {
     }
 
     public boolean isUserEnrolled() {
-
         return !new LocationAppSharedPreferences(this).getNameFromSharedPreferences().equals("");
     }
 
@@ -99,9 +101,10 @@ public class FirstLogInActivity extends AppCompatActivity {
                     }
                     try {
                         responseJson = new JSONObject(responseString);
-                        sharedPreferences.saveToken(Integer.valueOf(responseJson.get("id").toString()));
+                        sharedPreferences.saveToken(Integer.valueOf(responseJson.get(TOKEN).toString()));
 
                     } catch (JSONException e) {
+                        showToast("Response from server might be bad!");
                         mLogger.log("converting response", e);
                     }
                     mLogger.log("id: " + sharedPreferences.getToken());
@@ -113,7 +116,7 @@ public class FirstLogInActivity extends AppCompatActivity {
                     startActivity(intent);
 
                 } else {
-                    showToast("Response is not 200");
+                    showToast("Response from server is not 200");
                 }
 
 
@@ -133,10 +136,16 @@ public class FirstLogInActivity extends AppCompatActivity {
 
     private String getRegistrationData() throws JSONException {
         JSONObject postData = new JSONObject();
-        postData.accumulate(LocationAppSharedPreferences.USER_NAME_KEY, nameEdiText.getText());
-        postData.accumulate(LocationAppSharedPreferences.USER_SURNAME_KEY, surnameEditText.getText());
+        postData.accumulate(USER_NAME_KEY, nameEdiText.getText());
+        postData.accumulate(USER_SURNAME_KEY, surnameEditText.getText());
         return postData.toString();
     }
 
+
+    private void goToMain() {
+        Intent intent = new Intent(FirstLogInActivity.this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
 
 }

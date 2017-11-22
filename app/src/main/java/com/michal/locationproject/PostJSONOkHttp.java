@@ -11,14 +11,12 @@ import okhttp3.RequestBody;
 
 class PostJSONOkHttp {
 
-    static final String POST_RESPONSE_EXTRA = "POST_RESPONSE";
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
     private OkHttpClient httpClient;
     private Callback mCallback;
 
     PostJSONOkHttp(Callback callback) {
-
         this.mCallback = callback;
         httpClient = new OkHttpClient();
     }

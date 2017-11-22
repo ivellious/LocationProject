@@ -16,6 +16,7 @@ public class LocationProject extends Application {
             @Override
             public void uncaughtException(Thread paramThread, Throwable paramThrowable) {
                 Log.e("Location App"," Something went wrong", paramThrowable);
+
             }
         });
     }

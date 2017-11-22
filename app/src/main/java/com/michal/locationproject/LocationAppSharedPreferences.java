@@ -54,6 +54,4 @@ public class LocationAppSharedPreferences {
         return getSharedPreferences().getInt(TOKEN, -1);
     }
 
-    //// TODO: 18.10.17 GET TOKEN FROM SERVER AND PUT IT AS SHARED PREFERENCE
-
 }

@@ -17,6 +17,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 /**
+ *
+ * for comparision purposes
  * Created by michal on 04.10.17.
  */
 

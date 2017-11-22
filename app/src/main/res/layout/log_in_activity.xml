@@ -13,7 +13,7 @@
     <EditText
         android:hint="name"
         android:id="@+id/insertNameEditText"
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"/>
 
     <TextView
@@ -24,13 +24,14 @@
     <EditText
         android:hint="surname"
         android:id="@+id/insertSurnameEditText"
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"/>
 
     <Button
+        android:textAllCaps="false"
         android:id="@+id/submitButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Register user"/>
+        android:text="Submit"/>
 
 </LinearLayout>
