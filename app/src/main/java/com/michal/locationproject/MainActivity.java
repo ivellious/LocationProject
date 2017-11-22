@@ -1,7 +1,6 @@
 package com.michal.locationproject;
 
 import android.Manifest;
-import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -9,7 +8,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -18,7 +16,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -31,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String LATITUDE = "latitude";
     private static final String LAST_LOCATION_TIME = "last_location_time";
     public static final String MAIN_ACTIVITY_RECEIVER = "MAIN_ACTIVITY_RECEIVER";
-
+    PendingIntent locationPendingIntent;
 
     private TextView locationTextView;
     private TextView statusText;
@@ -113,15 +117,12 @@ public class MainActivity extends AppCompatActivity {
     private void initViews() {
         statusText = (TextView) this.findViewById(R.id.status);
         locationTextView = (TextView) this.findViewById(R.id.currentLocationText);
-
-
         sendJSONButton = (Button) this.findViewById(R.id.sendJSONButton);
-
         sendJSONButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (isConnected) {
-                    setLocationAlarm();
+                    checkLocationSettings();
                 } else {
                     showToast("Check internet connection");
                 }
@@ -129,12 +130,26 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void setLocationAlarm() {
-        Intent locationIntent = new Intent(this, LocationBroadcastReceiver.class);
-        PendingIntent locationPendingIntent = PendingIntent.getBroadcast(this, 132, locationIntent, 0);
-        AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(ALARM_SERVICE);
-        alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime(), 60000, locationPendingIntent);
+    private void checkLocationSettings() {
+        final LocationRequest locationRequest = new LocationRequest();
+        locationRequest.setInterval(java.util.concurrent.TimeUnit.SECONDS.toMillis(10));
+        locationRequest.setFastestInterval(java.util.concurrent.TimeUnit.SECONDS.toMillis(5));
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
+        SettingsClient client = LocationServices.getSettingsClient(this);
+        Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
+        task.addOnSuccessListener(this, new OnSuccessListener<LocationSettingsResponse>() {
+            @Override
+            public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
+                Intent locationIntent = new Intent(getApplicationContext(), LocationBroadcastReceiver.class);
+                locationPendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 132, locationIntent, 0);
+
+                try {
+                    fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationPendingIntent);
+                } catch (SecurityException ex) {
+                    logger.log("Security ex",ex);
+                }
+            }
+        });
     }
-
-
 }

@@ -75,7 +75,7 @@ public class FirstLogInActivity extends AppCompatActivity {
 
 
     private void registerUser() throws JSONException {
-        new PostJSONOkHttp(this, new Callback() {
+        new PostJSONOkHttp(new Callback() {
 
             @Override
             public void onFailure(Call call, IOException e) {
